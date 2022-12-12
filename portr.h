@@ -12,7 +12,7 @@ public:
     void write(QByteArray msg);
 
     void connect();
-    void disconnect();
+    void printError();
 
     QByteArray getData();
 

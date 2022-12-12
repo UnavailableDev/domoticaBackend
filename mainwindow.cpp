@@ -1,33 +1,38 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "portr.h"
-#include "main.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    fuck = new PortR;
+    serialPort = new PortR();
 }
 
 MainWindow::~MainWindow()
 {
+    delete serialPort;
     delete ui;
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    QByteArray msg = "haod\n";
+    serialPort->write(msg);
+
 }
 
 
 void MainWindow::on_pushButton_clicked()
 {
-    //do shit here
-    fuck->connect();
+    serialPort->printError();
 }
 
 
-void MainWindow::on_pushButton_2_clicked()
+void MainWindow::on_pushButton_3_clicked()
 {
-    QByteArray msg = "haod\n";
-    fuck->write(msg);
-
+    serialPort->connect();
 }
 

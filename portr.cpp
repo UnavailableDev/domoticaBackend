@@ -7,7 +7,8 @@
 PortR::PortR(){
     this->_serial = new QSerialPort;
 
-    _serial->setPortName("/Users/jregnier/ttypx");
+//    _serial->setPortName("/dev/tty.usbmodem0006851197611");
+    _serial->setPortName("/Users/jregnier/ttypx"); // set port here
     if(!_serial->setBaudRate(QSerialPort::Baud9600))
         qDebug() << _serial->errorString();
     if(!_serial->setDataBits(QSerialPort::Data8)) // data is 8 bits
@@ -19,6 +20,7 @@ PortR::PortR(){
     if(!_serial->setStopBits(QSerialPort::OneStop)) //default
         qDebug() << _serial->errorString();
 
+    this->connect();
 }
 
 PortR::~PortR(){
@@ -27,17 +29,19 @@ PortR::~PortR(){
 
 void PortR::action(){
     //this is called when readyRead();
-    int bytes = _serial->bytesAvailable();
-    if(bytes > 0){
-        qDebug() << "new Data arived" << _serial->bytesAvailable();
-        _msg = _serial->readAll();
-        qDebug() << _msg;
-    }
+
+    qDebug() << "new Data arived" << _serial->bytesAvailable();
+    _msg = _serial->readAll();
+    qDebug() << _msg;
+    this->write("echo: " + _msg);
+
 }
 
+#include <iostream>
 void PortR::write(QByteArray msg){
-    _serial->write(msg);
-    qDebug() << _serial->errorString();
+    std::cout << _serial->isOpen() << std::endl;
+    if(_serial->write(msg) == -1)
+        qDebug() << _serial->errorString();
 }
 
 void PortR::connect(){
@@ -49,15 +53,17 @@ void PortR::connect(){
     QObject::connect(_serial, &QSerialPort::readyRead, [&]
     {
         //this is called when readyRead();
-        action();
+        int bytes = _serial->bytesAvailable();
+        if(bytes > 0){
+            action();
+        }
     });
 
 }
 
-void PortR::disconnect(){
-    // WIP?
+void PortR::printError(){
+    qDebug() << _serial->errorString();
 }
-
 
 QByteArray PortR::getData(){
     return _msg;
